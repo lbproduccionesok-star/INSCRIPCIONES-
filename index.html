@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planilla de Inscripción | LB Producciones</title>
+<style>
+  :root{
+    --bg:#0d0d1a; --card:#16162b; --card2:#1e1e38; --text:#f0f0fa;
+    --muted:#9a9ab5; --accent:#e63973; --accent2:#7b2ff7; --ok:#22c07a; --warn:#f5b301;
+    --border:#2c2c4d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,Arial,sans-serif}
+  body{background:radial-gradient(1200px 600px at 80% -10%,#2a1454 0%,transparent 60%),
+       radial-gradient(900px 500px at -10% 110%,#3a0f2e 0%,transparent 55%),var(--bg);
+       color:var(--text);min-height:100vh;padding:24px 16px 80px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{text-align:center;margin-bottom:28px}
+  .logo{font-size:clamp(26px,5vw,44px);font-weight:800;letter-spacing:1px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);margin-top:6px;font-size:15px}
+
+  /* Selector de modalidad */
+  .mode-box{background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:18px;margin-bottom:22px;text-align:center}
+  .mode-box h3{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+  .mode-toggle{display:inline-flex;background:var(--card2);border:1px solid var(--border);
+    border-radius:999px;padding:5px;gap:5px;flex-wrap:wrap;justify-content:center}
+  .mode-toggle button{border:0;background:transparent;color:var(--muted);padding:10px 22px;
+    border-radius:999px;cursor:pointer;font-size:15px;font-weight:600;transition:.2s}
+  .mode-toggle button.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
+
+  .grid{display:grid;grid-template-columns:1fr 1.15fr;gap:22px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}
+  .card h2{font-size:19px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .field{margin-bottom:14px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  input,select,textarea{width:100%;background:var(--card2);border:1px solid var(--border);
+    color:var(--text);padding:11px 13px;border-radius:10px;font-size:15px;outline:none;transition:.15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(123,47,247,.18)}
+  input::placeholder{color:#5c5c7d}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:480px){.two{grid-template-columns:1fr}}
+
+  .btn{border:0;border-radius:10px;padding:12px 20px;font-size:15px;font-weight:700;cursor:pointer;transition:.15s}
+  .btn-primary{width:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;margin-top:6px}
+  .btn-primary:hover{filter:brightness(1.12)}
+  .btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+  .btn-ghost:hover{border-color:var(--accent2)}
+  .btn-danger{background:transparent;color:#ff6b6b;border:1px solid #553;border:1px solid rgba(255,107,107,.35)}
+  .btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{position:sticky;top:0;background:var(--card2);text-align:left;padding:10px;color:var(--muted);
+    font-size:11.5px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+  td{padding:10px;border-top:1px solid var(--border);vertical-align:top}
+  .table-scroll{max-height:520px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  .b-ok{background:rgba(34,192,122,.15);color:var(--ok)}
+  .b-pend{background:rgba(245,179,1,.15);color:var(--warn)}
+  .row-actions{white-space:nowrap}
+  .row-actions button{margin-right:6px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  @media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+  .stat .n{font-size:26px;font-weight:800}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:2px}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .toolbar input{flex:1;min-width:180px}
+  .msg{padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:14px;display:none}
+  .msg.ok{display:block;background:rgba(34,192,122,.12);border:1px solid rgba(34,192,122,.4);color:var(--ok)}
+  .msg.err{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.4);color:#ff8585}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:36px}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+
+  /* Panel oculto de fotos/videos */
+  #mediaModal{position:fixed;inset:0;background:rgba(5,5,15,.82);display:none;
+    align-items:center;justify-content:center;z-index:100;padding:16px}
+  .media-card{width:100%;max-width:480px;max-height:90vh;overflow:auto}
+  .file-item{display:flex;justify-content:space-between;align-items:center;gap:8px;
+    background:var(--card2);border:1px solid var(--border);border-radius:10px;
+    padding:8px 12px;margin-top:8px;font-size:13.5px}
+  .dropzone{border:2px dashed var(--border);border-radius:12px;padding:26px;text-align:center;
+    color:var(--muted);cursor:pointer;transition:.2s}
+  .dropzone:hover,.dropzone.over{border-color:var(--accent2);color:var(--text);background:rgba(123,47,247,.08)}
+  .progress{height:6px;background:var(--card2);border-radius:99px;margin-top:14px;overflow:hidden}
+  .progress div{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.3s}
+  .close-x{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo" id="mainTitle">🎤 Planilla de Inscripción</div>
+    <div class="sub" id="mainSub"><b>LB Producciones</b> · Certamen de Canto & Clases de Canto — un mismo formulario para ambos</div>
+    <div id="vistaTag" style="margin-top:10px"></div>
+  </header>
+
+  <!-- MODALIDAD -->
+  <div class="mode-box">
+    <h3>Elegí la modalidad de la planilla</h3>
+    <div class="mode-toggle">
+      <button id="mCertamen" class="active" onclick="setMode('certamen')">🏆 Certamen de Canto</button>
+      <button id="mClases" onclick="setMode('clases')">🎵 Clases de Canto</button>
+    </div>
+    <p class="hint" id="modeHint"></p>
+  </div>
+
+  <div class="grid">
+
+    <!-- FORMULARIO -->
+    <div class="card">
+      <h2>📝 Formulario de Inscripción</h2>
+      <div id="formMsg" class="msg"></div>
+      <div id="payBox" class="msg" style="display:none;background:rgba(123,47,247,.12);border:1px solid rgba(123,47,247,.4);color:#d0b8ff;text-align:center"></div>
+      <form id="regForm" onsubmit="return guardarInscripto(event)">
+        <input type="hidden" id="editId" value="">
+        <div class="two">
+          <div class="field"><label>Nombre *</label><input id="fNombre" required placeholder="Ej: María"></div>
+          <div class="field"><label>Apellido *</label><input id="fApellido" required placeholder="Ej: González"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Nombre artístico *</label><input id="fArtistico" required placeholder="Ej: La Voz del Sur"></div>
+          <div class="field"><label>Edad *</label><input id="fEdad" type="number" min="4" max="100" required placeholder="Ej: 25"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>WhatsApp / Teléfono *</label><input id="fTel" required placeholder="Ej: 11 5555 5555"></div>
+          <div class="field"><label>Email * <span style="font-weight:400">(para recibir la confirmación)</span></label><input id="fEmail" type="email" required placeholder="tumail@mail.com"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Ciudad / Localidad *</label><input id="fCiudad" required placeholder="Ej: Córdoba"></div>
+          <div class="field"><label>Provincia</label><input id="fProvincia" placeholder="Ej: Córdoba"></div>
+        </div>
+        <!-- Campos dinámicos según modalidad -->
+        <div id="certamenFields">
+          <div class="field">
+            <label>Categoría por edad *</label>
+            <select id="fCategoria">
+              <option value="">Seleccionar…</option>
+              <option>Infantil (4 a 11)</option>
+              <option>Juvenil (12 a 17)</option>
+              <option>Adulto (18 a 39)</option>
+              <option>Senior (+40)</option>
+            </select>
+          </div>
+          <div class="field"><label>Canción con la que participa</label><input id="fCancion" placeholder="Ej: Mi Buenos Aires Querido"></div>
+          <div class="field"><label>Link de video / audio (opcional)</label><input id="fLink" placeholder="YouTube, Drive, Instagram…"></div>
+        </div>
+        <div id="clasesFields" style="display:none">
+          <div class="field">
+            <label>Nivel *</label>
+            <select id="fNivel">
+              <option value="">Seleccionar…</option>
+              <option>Principiante</option>
+              <option>Intermedio</option>
+              <option>Avanzado</option>
+            </select>
+          </div>
+          <div class="field"><label>Horario preferido</label>
+            <select id="fHorario">
+              <option value="">Seleccionar…</option>
+              <option>Mañana</option>
+              <option>Tarde</option>
+              <option>Noche</option>
+              <option>Fin de semana</option>
+            </select>
+          </div>
+          <div class="field"><label>Modalidad de clase</label>
+            <select id="fModClase">
+              <option>Presencial</option>
+              <option>Virtual</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Estado del pago / inscripción</label>
+          <select id="fPago">
+            <option value="Pendiente">Pendiente</option>
+            <option value="Confirmado">Confirmado / Pago</option>
+          </select>
+        </div>
+        <div class="field"><label>Observaciones</label><textarea id="fObs" rows="2" placeholder="Alergías, experiencia previa, comentarios…"></textarea></div>
+        <button class="btn btn-primary" id="submitBtn" type="submit">✅ Confirmar Inscripción</button>
+        <button class="btn btn-ghost" id="cancelEditBtn" type="button" style="display:none;width:100%;margin-top:8px" onclick="cancelarEdicion()">Cancelar edición</button>
+      </form>
+    </div>
+
+    <!-- PLANILLA -->
+    <div class="card">
+      <h2>📊 Planilla de Inscriptos</h2>
+      <div class="stats">
+        <div class="stat"><div class="n" id="stTotal" style="color:var(--accent2)">0</div><div class="l">Total</div></div>
+        <div class="stat"><div class="n" id="stConf" style="color:var(--ok)">0</div><div class="l">Confirmados</div></div>
+        <div class="stat"><div class="n" id="stPend" style="color:var(--warn)">0</div><div class="l">Pendientes</div></div>
+        <div class="stat"><div class="n" id="stModo" style="color:var(--accent)">—</div><div class="l">Modalidad</div></div>
+      </div>
+      <div class="toolbar">
+        <input id="buscar" placeholder="🔍 Buscar por nombre, artístico, ciudad…" oninput="renderTabla()">
+        <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇️ Exportar Excel / CSV</button>
+        <button class="btn btn-danger btn-sm" onclick="borrarTodo()">🗑️ Borrar todo</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Nombre y apellido</th><th>Nombre artístico</th><th>Edad</th>
+            <th>WhatsApp</th><th>Ciudad</th><th id="thDin1">Categoría</th><th>Pago</th><th></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p class="hint">💾 Los datos se guardan en este navegador. Exportá a CSV periódicamente para tener un respaldo en Excel/Google Sheets.</p>
+    </div>
+  </div>
+
+  <!-- ACCESO ADMIN (oculto para el publico) -->
+  <div id="adminModal" onclick="if(event.target===this)cerrarAdmin()"
+     style="position:fixed;inset:0;background:rgba(5,5,15,.88);display:none;align-items:center;justify-content:center;z-index:110;padding:16px">
+    <div id="adminGate" class="card" style="max-width:420px;width:100%;position:relative;margin:0">
+      <button class="close-x" onclick="cerrarAdmin()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+    <h2>🔐 Acceso Administrador</h2>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:12px">Ingresá la contraseña para ver y gestionar la planilla de inscriptos.</p>
+    <div id="gateMsg" class="msg"></div>
+    <div class="field"><input type="password" id="gatePass" placeholder="Contraseña de administrador" onkeydown="if(event.key==='Enter'){intentarAdmin()}"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="intentarAdmin()">Ingresar</button>
+  </div>
+
+<!-- PANEL OCULTO DE FOTOS Y VIDEOS -->
+  <div id="mediaModal" onclick="if(event.target===this)cerrarPanelMedios()">
+    <div class="card media-card">
+      <button class="close-x" onclick="cerrarPanelMedios()">✕</button>
+      <h2>📷 Panel de Medios</h2>
+      <div id="mediaGate">
+        <p style="color:var(--muted);font-size:13.5px;margin-bottom:12px">Área restringida. Ingresá la contraseña.</p>
+        <div id="mediaGateMsg" class="msg"></div>
+        <div class="field"><input type="password" id="mediaPass" placeholder="Contraseña" onkeydown="if(event.key==='Enter'){intentarMedia()}"></div>
+        <button class="btn btn-primary" style="width:100%" onclick="intentarMedia()">Ingresar</button>
+      </div>
+      <div id="mediaZone" style="display:none">
+        <div class="dropzone" id="dropzone"
+          onclick="document.getElementById('mediaInput').click()"
+          ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
+          📸🎬<br><b>Arrastrá acá tus fotos o videos</b> desde tu dispositivo<br>
+          <span style="font-size:12px">(o tocá para elegirlos a mano, podés elegir varios)</span>
+        </div>
+        <input type="file" id="mediaInput" accept="image/*,video/*" multiple style="display:none" onchange="onMediaSelect(this)">
+        <div id="mediaList"></div>
+        <div class="progress" id="mediaProgress" style="display:none"><div></div></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="subirMedios()">⬆️ Subir archivos a mi Drive</button>
+        <div id="mediaResult" style="margin-top:12px;font-size:13.5px"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Hecho con 🎶 para cantantes · Planilla de inscripción adaptable</footer>
+</div>
+
+<script>
+// ============================================
+// CAMBIÁ ESTA CONTRASEÑA POR LA TUYA ↓↓↓
+const ADMIN_PASS = 'lb2026';
+// ============================================
+
+// ============================================
+// PASO FINAL: pegá acá la URL que te da Google
+// cuando desplegás el script (te lo explico en
+// las instrucciones). Mientras esté como está,
+// el formulario funciona igual pero solo guarda
+// localmente.
+const GOOGLE_SCRIPT_URL = 'PEGAR_ACA_LA_URL_DE_GOOGLE';
+
+// ============================================
+// PEGÁ ACÁ tu link de pago de Mercado Pago
+// (el que generás desde tu cuenta de MP).
+// Así, después de inscribirse, les aparece el
+// botón para pagar.
+const MP_PAYMENT_LINK = 'PEGAR_ACA_TU_LINK_DE_MERCADO_PAGO';
+// ============================================
+// ============================================
+const LS_DATA = 'planilla_inscriptos_v1';
+const LS_ADMIN = 'planilla_admin_v1';
+const LS_MODE = 'planilla_modalidad_v1';
+let modalidad = localStorage.getItem(LS_MODE) || 'certamen';
+let inscriptos = JSON.parse(localStorage.getItem(LS_DATA) || '[]');
+
+function setMode(m){
+  modalidad = m;
+  localStorage.setItem(LS_MODE, m);
+  const esCertamen = m === 'certamen';
+  document.getElementById('mCertamen').classList.toggle('active', esCertamen);
+  document.getElementById('mClases').classList.toggle('active', !esCertamen);
+  document.getElementById('certamenFields').style.display = esCertamen ? '' : 'none';
+  document.getElementById('clasesFields').style.display = esCertamen ? 'none' : '';
+  document.getElementById('mainTitle').textContent = esCertamen ? '🏆 Planilla de Inscripción · Concurso de Canto' : '🎵 Planilla de Inscripción · Clases de Canto';
+  document.getElementById('modeHint').textContent = esCertamen
+    ? 'Modalidad certamen: se piden categoría por edad, canción y video de presentación.'
+    : 'Modalidad clases: se piden nivel, horario preferido y si quiere presencial o virtual.';
+  document.getElementById('thDin1').textContent = esCertamen ? 'Categoría' : 'Nivel';
+  document.getElementById('fCategoria').required = esCertamen;
+  document.getElementById('fNivel').required = !esCertamen;
+  renderTabla();
+}
+
+function msg(id, texto, ok){
+  const el = document.getElementById(id);
+  el.textContent = texto;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+  setTimeout(()=>{ el.className='msg'; el.textContent=''; }, 4000);
+}
+
+function guardarInscripto(e){
+  e.preventDefault();
+  const nombre = document.getElementById('fNombre').value.trim();
+  const apellido = document.getElementById('fApellido').value.trim();
+  if(!nombre || !apellido){ msg('formMsg','Completá nombre y apellido.', false); return false; }
+  const datos = {
+    id: document.getElementById('editId').value || Date.now().toString(36),
+    fecha: new Date().toLocaleString('es-AR'),
+    modalidad,
+    nombre, apellido,
+    artistico: document.getElementById('fArtistico').value.trim(),
+    edad: document.getElementById('fEdad').value.trim(),
+    tel: document.getElementById('fTel').value.trim(),
+    email: document.getElementById('fEmail').value.trim(),
+    ciudad: document.getElementById('fCiudad').value.trim(),
+    provincia: document.getElementById('fProvincia').value.trim(),
+    categoria: document.getElementById('fCategoria').value,
+    cancion: document.getElementById('fCancion').value.trim(),
+    link: document.getElementById('fLink').value.trim(),
+    nivel: document.getElementById('fNivel').value,
+    horario: document.getElementById('fHorario').value,
+    modClase: document.getElementById('fModClase').value,
+    pago: document.getElementById('fPago').value,
+    obs: document.getElementById('fObs').value.trim()
+  };
+  const idx = inscriptos.findIndex(x => x.id === datos.id);
+  if(idx >= 0) inscriptos[idx] = datos; else inscriptos.push(datos);
+  persistir();
+  enviarAGoogle(datos);
+  document.getElementById('regForm').reset();
+  cancelarEdicion();
+  const payBox = document.getElementById('payBox');
+  if(MP_PAYMENT_LINK && MP_PAYMENT_LINK.indexOf('http') === 0){
+    payBox.innerHTML = '✅ ¡Inscripción de <b>' + nombre + ' ' + apellido + '</b> recibida!<br>' +
+      '<span style="font-size:13px">Tu inscripción queda <b>PENDIENTE</b> hasta que se acredite el pago.</span><br><br>' +
+      '<a href="' + MP_PAYMENT_LINK + '" target="_blank" style="display:inline-block;background:linear-gradient(90deg,#00b1ea,#009ee3);color:#fff;padding:12px 26px;border-radius:10px;text-decoration:none;font-weight:700">💳 Pagar inscripción con Mercado Pago</a>';
+    payBox.style.display = 'block';
+    msg('formMsg', '✅ Inscripción guardada. Falta completar el pago para confirmarla.', true);
+  } else {
+    payBox.style.display = 'none';
+    msg('formMsg', '✅ Inscripción de ' + nombre + ' ' + apellido + ' guardada. Queda pendiente de pago.', true);
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+  return false;
+}
+
+function editar(id){
+  const p = inscriptos.find(x => x.id === id);
+  if(!p) return;
+  if(p.modalidad !== modalidad) setMode(p.modalidad);
+  document.getElementById('editId').value = p.id;
+  document.getElementById('fNombre').value = p.nombre;
+  document.getElementById('fApellido').value = p.apellido;
+  document.getElementById('fArtistico').value = p.artistico;
+  document.getElementById('fEdad').value = p.edad;
+  document.getElementById('fTel').value = p.tel;
+  document.getElementById('fEmail').value = p.email || '';
+  document.getElementById('fCiudad').value = p.ciudad;
+  document.getElementById('fProvincia').value = p.provincia || '';
+  document.getElementById('fCategoria').value = p.categoria || '';
+  document.getElementById('fCancion').value = p.cancion || '';
+  document.getElementById('fLink').value = p.link || '';
+  document.getElementById('fNivel').value = p.nivel || '';
+  document.getElementById('fHorario').value = p.horario || '';
+  document.getElementById('fModClase').value = p.modClase || 'Presencial';
+  document.getElementById('fPago').value = p.pago;
+  document.getElementById('fObs').value = p.obs || '';
+  document.getElementById('submitBtn').textContent = '💾 Guardar cambios';
+  document.getElementById('cancelEditBtn').style.display = '';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function cancelarEdicion(){
+  document.getElementById('editId').value = '';
+  document.getElementById('submitBtn').textContent = '✅ Confirmar Inscripción';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+}
+
+function borrar(id){
+  if(!confirm('¿Borrar este inscripto?')) return;
+  inscriptos = inscriptos.filter(x => x.id !== id);
+  persistir();
+}
+
+function cambiarPago(id){
+  const p = inscriptos.find(x => x.id === id);
+  if(!p) return;
+  p.pago = p.pago === 'Confirmado' ? 'Pendiente' : 'Confirmado';
+  persistir();
+}
+
+function borrarTodo(){
+  if(!inscriptos.length) return;
+  if(!confirm('⚠️ ¿Borrar TODOS los inscriptos? Esta acción no se puede deshacer.')) return;
+  inscriptos = [];
+  persistir();
+}
+
+function persistir(){
+  localStorage.setItem(LS_DATA, JSON.stringify(inscriptos));
+  renderTabla();
+}
+
+function renderTabla(){
+  const q = (document.getElementById('buscar').value || '').toLowerCase();
+  const fila = p => (p.nombre+' '+p.apellido+' '+p.artistico+' '+p.ciudad+' '+p.provincia+' '+(p.categoria||'')+' '+(p.nivel||'')).toLowerCase().includes(q);
+  const lista = inscriptos.filter(fila);
+  const esCertamen = modalidad === 'certamen';
+  const tb = document.getElementById('tbody');
+  tb.innerHTML = lista.map((p,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><b>${esc(p.nombre)} ${esc(p.apellido)}</b><br><span style="color:var(--muted);font-size:11.5px">${esc(p.email||'')}</span></td>
+      <td>🎤 ${esc(p.artistico)}</td>
+      <td>${esc(p.edad)}</td>
+      <td>${esc(p.tel)}</td>
+      <td>${esc(p.ciudad)}${p.provincia?'<br><span style="color:var(--muted);font-size:11.5px">'+esc(p.provincia)+'</span>':''}</td>
+      <td>${esCertamen ? esc(p.categoria||'—')+(p.cancion?'<br><span style="color:var(--muted);font-size:11.5px">🎵 '+esc(p.cancion)+'</span>':'')
+                       : esc(p.nivel||'—')+(p.horario?'<br><span style="color:var(--muted);font-size:11.5px">🕐 '+esc(p.horario)+' · '+esc(p.modClase||'')+'</span>':'')}</td>
+      <td><span class="badge ${p.pago==='Confirmado'?'b-ok':'b-pend'}" style="cursor:pointer" title="Click para cambiar" onclick="cambiarPago('${p.id}')">${p.pago}</span></td>
+      <td class="row-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editar('${p.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="borrar('${p.id}')">🗑️</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:30px">Todavía no hay inscriptos en esta modalidad. ¡Cargá el primero! 🎶</td></tr>';
+  const deModo = inscriptos.filter(p => p.modalidad === modalidad);
+  document.getElementById('stTotal').textContent = deModo.length;
+  document.getElementById('stConf').textContent = deModo.filter(p=>p.pago==='Confirmado').length;
+  document.getElementById('stPend').textContent = deModo.filter(p=>p.pago!=='Confirmado').length;
+  document.getElementById('stModo').textContent = esCertamen ? '🏆' : '🎵';
+}
+
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function exportarCSV(){
+  if(!inscriptos.length){ alert('No hay inscriptos para exportar.'); return; }
+  const cab = ['Fecha','Modalidad','Nombre','Apellido','Nombre artístico','Edad','WhatsApp','Email','Ciudad','Provincia','Categoría','Canción','Link video','Nivel','Horario','Tipo clase','Pago','Observaciones'];
+  const filas = inscriptos.map(p => [p.fecha, p.modalidad==='certamen'?'Certamen':'Clases', p.nombre, p.apellido, p.artistico, p.edad, p.tel, p.email, p.ciudad, p.provincia, p.categoria, p.cancion, p.link, p.nivel, p.horario, p.modClase, p.pago, p.obs]
+    .map(v => '"' + String(v??'').replace(/"/g,'""') + '"').join(','));
+  const csv = '\ufeff' + cab.join(',') + '\n' + filas.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'planilla_inscriptos_canto.csv';
+  a.click();
+}
+
+let esAdmin = sessionStorage.getItem(LS_ADMIN) === '1';
+
+function aplicarVista(){
+  const planilla = document.querySelectorAll('.grid .card')[1];
+  const tag = document.getElementById('vistaTag');
+  if(esAdmin){
+    planilla.style.display = '';
+    tag.innerHTML = '<span class="badge b-ok">🔐 MODO ADMINISTRADOR</span> &nbsp;<a href="#" style="color:var(--muted);font-size:13px" onclick="salirAdmin();return false">Cerrar sesión</a>';
+  } else {
+    planilla.style.display = 'none';
+    tag.innerHTML = '<span class="badge b-pend">📝 VISTA PÚBLICA</span>';
+  }
+}
+
+// ABRIR ADMIN: Ctrl + Shift + A (nada visible en la pagina publica)
+document.addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')){
+    abrirAdmin();
+  }
+});
+function abrirAdmin(){ document.getElementById('adminModal').style.display = 'flex'; }
+function cerrarAdmin(){ document.getElementById('adminModal').style.display = 'none'; }
+
+function intentarAdmin(){
+  const pass = document.getElementById('gatePass').value;
+  if(pass === ADMIN_PASS){
+    sessionStorage.setItem(LS_ADMIN,'1');
+    esAdmin = true;
+    aplicarVista();
+    cerrarAdmin();
+  } else {
+    const el = document.getElementById('gateMsg');
+    el.textContent = '❌ Contraseña incorrecta. Intentá de nuevo.';
+    el.className = 'msg err';
+    setTimeout(()=>{el.className='msg';el.textContent='';},3000);
+  }
+}
+
+function salirAdmin(){
+  sessionStorage.removeItem(LS_ADMIN);
+  esAdmin = false;
+  aplicarVista();
+}
+
+// Envia los datos a tu Google Sheet y te llega un email aviso.
+// Si la URL todavía no está configurada, simplemente no hace nada.
+function enviarAGoogle(datos){
+  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf('http') !== 0) return;
+  try{
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(datos)
+    });
+  }catch(e){ /* si falla, los datos igual quedan guardados localmente */ }
+}
+
+// ============================================
+// CONTRASEÑA DEL PANEL DE FOTOS/VIDEOS ↓↓↓
+const MEDIA_PASS = 'lb2026';
+// ============================================
+let mediaFiles = [];
+
+// ABRIR EL PANEL DE MEDIOS: Ctrl + Shift + M (no hay boton visible)
+document.addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.shiftKey && (e.key === 'M' || e.key === 'm')){
+    mostrarPanelMedios();
+  }
+});
+
+function dragOver(e){ e.preventDefault(); e.currentTarget.classList.add('over'); }
+function dragLeave(e){ e.currentTarget.classList.remove('over'); }
+
+function dropFiles(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('over');
+  const files = Array.from(e.dataTransfer.files).filter(f =>
+    f.type.startsWith('image/') || f.type.startsWith('video/'));
+  if(!files.length){
+    alert('Solo se permiten fotos y videos.');
+    return;
+  }
+  mediaFiles = mediaFiles.concat(files);
+  renderMediaList();
+}
+
+function renderMediaList(){
+  document.getElementById('mediaList').innerHTML = mediaFiles.map(f =>
+    '<div class="file-item"><span>📄 ' + f.name + '</span><span style="color:var(--muted)">' +
+    (f.size/1048576).toFixed(1) + ' MB</span></div>').join('');
+}
+
+function mostrarPanelMedios(){
+  document.getElementById('mediaModal').style.display = 'flex';
+  if(sessionStorage.getItem('media_ok') === '1'){
+    document.getElementById('mediaGate').style.display = 'none';
+    document.getElementById('mediaZone').style.display = '';
+  }
+}
+function cerrarPanelMedios(){ document.getElementById('mediaModal').style.display = 'none'; }
+
+function intentarMedia(){
+  if(document.getElementById('mediaPass').value === MEDIA_PASS){
+    sessionStorage.setItem('media_ok','1');
+    document.getElementById('mediaGate').style.display = 'none';
+    document.getElementById('mediaZone').style.display = '';
+  } else {
+    const el = document.getElementById('mediaGateMsg');
+    el.textContent = '❌ Contraseña incorrecta.';
+    el.className = 'msg err';
+    setTimeout(()=>{el.className='msg';el.textContent='';},3000);
+  }
+}
+
+function onMediaSelect(input){
+  mediaFiles = mediaFiles.concat(Array.from(input.files));
+  renderMediaList();
+}
+
+async function subirMedios(){
+  if(!mediaFiles.length){ alert('Elegí al menos un archivo.'); return; }
+  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf('http') !== 0){
+    alert('Todavía no configuraste la URL de Google. Pegala donde dice GOOGLE_SCRIPT_URL.');
+    return;
+  }
+  const bar = document.getElementById('mediaProgress');
+  const barFill = bar.querySelector('div');
+  const result = document.getElementById('mediaResult');
+  bar.style.display = ''; result.innerHTML = '';
+  let okCount = 0;
+
+  for(let i = 0; i < mediaFiles.length; i++){
+    const f = mediaFiles[i];
+    result.innerHTML += '<div class="file-item"><span>⏳ ' + f.name + '</span><span>Subiendo…</span></div>';
+    barFill.style.width = Math.round(i / mediaFiles.length * 100) + '%';
+    try{
+      const dataUrl = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(f);
+      });
+      const base64 = dataUrl.split(',')[1];
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'text/plain'},
+        body: JSON.stringify({action:'upload', filename: f.name, mimeType: f.type, data: base64})
+      });
+      okCount++;
+      result.innerHTML += '<div class="file-item" style="border-color:rgba(34,192,122,.5)"><span>✅ ' + f.name + '</span><span style="color:var(--ok)">Listo</span></div>';
+    }catch(err){
+      result.innerHTML += '<div class="file-item" style="border-color:rgba(255,107,107,.5)"><span>❌ ' + f.name + '</span><span style="color:#ff8585">Error</span></div>';
+    }
+  }
+  barFill.style.width = '100%';
+  result.innerHTML += '<div style="margin-top:10px;color:var(--ok);font-weight:600">📁 ' + okCount + ' de ' + mediaFiles.length + ' archivos enviados a tu Google Drive.</div>';
+  mediaFiles = [];
+  document.getElementById('mediaInput').value = '';
+  document.getElementById('mediaList').innerHTML = '';
+}
+
+setMode(modalidad);
+aplicarVista();
+</script>
+</body>
+</html>
